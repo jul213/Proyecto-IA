@@ -1,27 +1,28 @@
-import os
+import streamlit as st
 from transformers import pipeline
 
+# Configuración de la página
+st.set_page_config(page_title="IA Summarizer Pro", page_icon="🤖")
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+st.title("🤖 Resumidor de Textos con IA")
+st.markdown("Este proyecto utiliza el modelo **DistilBART** para crear resúmenes inteligentes.")
 
-def main():
-    print("---Iniciando IA de julio🤖---")
-    print("Cargando modelo de lenguaje (esto puede tardar un poco la primera vez)")
+# Cargar el modelo (se guarda en caché para que sea rápido)
+@st.cache_resource
+def cargar_modelo():
+    return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
 
-    summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+summarizer = cargar_modelo()
 
-    print("\n✅ IA LISTA. Por favor, introduce un texto largo para resumir:")
-    texto_usuario = input("> ")
+# Interfaz de usuario
+texto_entrada = st.text_area("Pega aquí el texto que quieras resumir:", height=200)
 
-    if len(texto_usuario) < 30:
-        print("❌ El texto es muy corto para resumirlo. Prueba con algo más largo.")
+if st.button("Generar Resumen"):
+    if texto_entrada:
+        with st.spinner('La IA está pensando...'):
+            resumen = summarizer(texto_entrada, max_length=130, min_length=30, do_sample=False)
+            st.success("¡Resumen completado!")
+            st.subheader("Resultado:")
+            st.write(resumen[0]['summary_text'])
     else:
-        # 3. La IA hace su magia
-        print("\nAnalizando y procesando...")
-        resumen = summarizer(texto_usuario, max_length=50, min_length=10, do_sample=False)
-        
-        print("\n✨ RESUMEN GENERADO:")
-        print(resumen[0]['summary_text'])
-
-if __name__ == "__main__":
-    main()
+        st.warning("Por favor, introduce algún texto.")
