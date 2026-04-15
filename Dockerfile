@@ -21,5 +21,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 EXPOSE 8501
-# 7. Comando para ejecutar tu IA
+# 7. Comando para ejecutar La IA
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
